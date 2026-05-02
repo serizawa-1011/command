@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -268,77 +267,76 @@ const cmds=[
   {cat:'misc',syn:'claude --plugin-dir path',copy:'claude --plugin-dir ./my-plugins',r:'<span class="c-base">claude</span> <span class="c-flag">--plugin-dir</span> <span class="c-arg">&lt;path&gt;</span>',desc:'このセッション限定でディレクトリからプラグインを読み込む。複数ディレクトリは --plugin-dir を繰り返す。',exH:'<span class="c-base">claude</span> <span class="c-flag">--plugin-dir</span> <span class="c-arg">./my-plugins</span>'}
 ];
 
-let curCat=‘all’,q=’’;
-function cnt(id){return id===‘all’?cmds.length:cmds.filter(c=>c.cat===id).length;}
+let curCat='all',q='';
+function cnt(id){return id==='all'?cmds.length:cmds.filter(c=>c.cat===id).length;}
 function buildNav(){
-const sb=document.getElementById(‘sb’),mt=document.getElementById(‘mt’);
-sb.innerHTML=’’;mt.innerHTML=’’;
-const lbl=document.createElement(‘div’);lbl.className=‘slbl’;lbl.textContent=‘CATEGORY’;sb.appendChild(lbl);
-cats.forEach(cat=>{
-const b=document.createElement(‘button’);b.className=‘cb’+(cat.id===curCat?’ active’:’’);
-b.innerHTML=’<span class="ci">’+cat.icon+’</span>’+cat.label+’<span class="cc">’+cnt(cat.id)+’</span>’;
-b.onclick=()=>{curCat=cat.id;q=’’;document.getElementById(‘si’).value=’’;buildNav();renderMain();};
-sb.appendChild(b);
-const t=document.createElement(‘button’);t.className=‘mtt’+(cat.id===curCat?’ active’:’’);
-t.textContent=cat.label;t.onclick=()=>{curCat=cat.id;q=’’;document.getElementById(‘si’).value=’’;buildNav();renderMain();};
-mt.appendChild(t);
-});
+  const sb=document.getElementById('sb'),mt=document.getElementById('mt');
+  sb.innerHTML='';mt.innerHTML='';
+  const lbl=document.createElement('div');lbl.className='slbl';lbl.textContent='CATEGORY';sb.appendChild(lbl);
+  cats.forEach(cat=>{
+    const b=document.createElement('button');b.className='cb'+(cat.id===curCat?' active':'');
+    b.innerHTML='<span class="ci">'+cat.icon+'</span>'+cat.label+'<span class="cc">'+cnt(cat.id)+'</span>';
+    b.onclick=()=>{curCat=cat.id;q='';document.getElementById('si').value='';buildNav();renderMain();};
+    sb.appendChild(b);
+    const t=document.createElement('button');t.className='mtt'+(cat.id===curCat?' active':'');
+    t.textContent=cat.label;t.onclick=()=>{curCat=cat.id;q='';document.getElementById('si').value='';buildNav();renderMain();};
+    mt.appendChild(t);
+  });
 }
 function renderMain(){
-const mc=document.getElementById(‘mc’);
-const cat=cats.find(c=>c.id===curCat);
-let filtered=cmds.filter(cmd=>{
-if(curCat!==‘all’&&cmd.cat!==curCat)return false;
-if(!q)return true;
-const lq=q.toLowerCase();
-return cmd.syn.toLowerCase().includes(lq)||cmd.desc.toLowerCase().includes(lq)||cmd.copy.toLowerCase().includes(lq);
-});
-let html=’’;
-if(curCat!==‘all’&&!q)html+=’<div class="sh"><div class="st"><span class="ic">’+cat.icon+’</span>’+cat.label+’</div><div class="sd">’+cat.desc+’</div></div>’;
-if(q)html+=’<div class="rc">検索結果: <span>’+filtered.length+’</span> 件</div>’;
-if(filtered.length===0){
-html+=’<div class="es"><div class="ei">⌀</div><p>該当するコマンドが見つかりません</p></div>’;
-} else {
-html+=’<div class="cg">’;
-if(curCat===‘all’&&!q){
-cats.filter(c=>c.id!==‘all’).forEach(cat=>{
-const cc=filtered.filter(cmd=>cmd.cat===cat.id);
-if(!cc.length)return;
-html+=’<div class="gl">’+cat.icon+’  ‘+cat.label+’</div>’;
-cc.forEach(cmd=>{html+=card(cmd);});
-});
-} else {filtered.forEach(cmd=>{html+=card(cmd);});}
-html+=’</div>’;
-}
-mc.innerHTML=html;
-mc.querySelectorAll(’.cb2’).forEach(btn=>{
-btn.onclick=e=>{
-e.stopPropagation();
-const txt=btn.dataset.copy;
-btn.textContent=‘✓ Copied!’;btn.classList.add(‘copied’);
-setTimeout(()=>{btn.textContent=‘Copy’;btn.classList.remove(‘copied’);},2000);
-try{navigator.clipboard.writeText(txt);}catch(_){
-const ta=document.createElement(‘textarea’);ta.value=txt;ta.style.cssText=‘position:fixed;opacity:0’;
-document.body.appendChild(ta);ta.select();document.execCommand(‘copy’);document.body.removeChild(ta);
-}
-};
-});
+  const mc=document.getElementById('mc');
+  const cat=cats.find(c=>c.id===curCat);
+  let filtered=cmds.filter(cmd=>{
+    if(curCat!=='all'&&cmd.cat!==curCat)return false;
+    if(!q)return true;
+    const lq=q.toLowerCase();
+    return cmd.syn.toLowerCase().includes(lq)||cmd.desc.toLowerCase().includes(lq)||cmd.copy.toLowerCase().includes(lq);
+  });
+  let html='';
+  if(curCat!=='all'&&!q)html+='<div class="sh"><div class="st"><span class="ic">'+cat.icon+'</span>'+cat.label+'</div><div class="sd">'+cat.desc+'</div></div>';
+  if(q)html+='<div class="rc">検索結果: <span>'+filtered.length+'</span> 件</div>';
+  if(filtered.length===0){
+    html+='<div class="es"><div class="ei">⌀</div><p>該当するコマンドが見つかりません</p></div>';
+  } else {
+    html+='<div class="cg">';
+    if(curCat==='all'&&!q){
+      cats.filter(c=>c.id!=='all').forEach(cat=>{
+        const cc=filtered.filter(cmd=>cmd.cat===cat.id);
+        if(!cc.length)return;
+        html+='<div class="gl">'+cat.icon+'  '+cat.label+'</div>';
+        cc.forEach(cmd=>{html+=card(cmd);});
+      });
+    } else {filtered.forEach(cmd=>{html+=card(cmd);});}
+    html+='</div>';
+  }
+  mc.innerHTML=html;
+  mc.querySelectorAll('.cb2').forEach(btn=>{
+    btn.onclick=e=>{
+      e.stopPropagation();
+      const txt=btn.dataset.copy;
+      btn.textContent='✓ Copied!';btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);
+      try{navigator.clipboard.writeText(txt);}catch(_){
+        const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
+        document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      }
+    };
+  });
 }
 function card(cmd){
-const sk=cmd.isSkill?’<span class="ts">Skill</span>’:’’;
-const copy=cmd.copy.replace(/”/g,’"’);
-return ‘<div class="cc2"><div class="ct"><div class="cd"><span class="pr">$</span>’+cmd.r+sk+’</div>’
-+’<button class="cb2" data-copy="'+copy+'">Copy</button></div>’
-+’<div class="dv"></div><div class="de">’+cmd.desc+’</div>’
-+’<div class="el">使用例</div><div class="ex"><span class="ep">$</span>’+cmd.exH+’</div></div>’;
+  const sk=cmd.isSkill?'<span class="ts">Skill</span>':'';
+  const copy=cmd.copy.replace(/"/g,'&quot;');
+  return '<div class="cc2"><div class="ct"><div class="cd"><span class="pr">$</span>'+cmd.r+sk+'</div>'
+    +'<button class="cb2" data-copy="'+copy+'">Copy</button></div>'
+    +'<div class="dv"></div><div class="de">'+cmd.desc+'</div>'
+    +'<div class="el">使用例</div><div class="ex"><span class="ep">$</span>'+cmd.exH+'</div></div>';
 }
-document.getElementById(‘si’).addEventListener(‘input’,e=>{
-q=e.target.value.trim();
-if(q&&curCat!==‘all’){curCat=‘all’;buildNav();}
-renderMain();
+document.getElementById('si').addEventListener('input',e=>{
+  q=e.target.value.trim();
+  if(q&&curCat!=='all'){curCat='all';buildNav();}
+  renderMain();
 });
 buildNav();renderMain();
 </script>
-
 </body>
 </html>
