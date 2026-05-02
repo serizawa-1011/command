@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code | コマンドリファレンス</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#141413;--bg2:#1a1916;--card:#1f1e1c;--card-hover:#252420;
+    --border:#2e2c28;--border-bright:#3d3a34;
+    --accent:#d97757;--accent-dim:rgba(217,119,87,0.08);--accent-mid:rgba(217,119,87,0.18);
+    --text:#c4bfb6;--text-dim:#6b6660;--text-bright:#f0ebe3;
+    --code:#e8956d;--code-arg:#f0c070;--code-flag:#a8c4a0;
+    --green:#7aad72;--sidebar-w:230px;
+    --mono:'JetBrains Mono',monospace;--sans:'Noto Sans JP',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+  header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+  .logo{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);white-space:nowrap;}
+  .logo span{color:var(--text-dim);font-weight:300;}
+  .hdiv{width:1px;height:18px;background:var(--border-bright);flex-shrink:0;}
+  .badge{font-family:var(--mono);font-size:9px;padding:2px 7px;border:1px solid var(--accent);color:var(--accent);border-radius:3px;letter-spacing:1px;opacity:.65;}
+  .swrap{flex:1;max-width:360px;margin-left:auto;position:relative;}
+  .sicon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:13px;pointer-events:none;font-family:var(--mono);}
+  #si{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:6px 10px 6px 30px;font-family:var(--mono);font-size:12px;color:var(--text-bright);outline:none;transition:border-color .2s,box-shadow .2s;}
+  #si::placeholder{color:var(--text-dim);}
+  #si:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(217,119,87,.12);}
+  .layout{display:flex;min-height:calc(100vh - 56px);}
+  aside{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+  .slbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);padding:0 16px 8px;text-transform:uppercase;}
+  .cb{display:flex;align-items:center;gap:8px;width:100%;padding:8px 16px;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--sans);font-size:12px;color:var(--text-dim);border-left:2px solid transparent;transition:all .15s;}
+  .cb:hover{background:var(--accent-dim);color:var(--text);}
+  .cb.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim);font-weight:500;}
+  .ci{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+  .cc{margin-left:auto;font-family:var(--mono);font-size:10px;background:var(--border);padding:1px 5px;border-radius:8px;color:var(--text-dim);}
+  .cb.active .cc{background:var(--accent-mid);color:var(--accent);}
+  main{flex:1;padding:24px 28px;min-width:0;}
+  .sh{margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+  .st{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--text-bright);display:flex;align-items:center;gap:8px;}
+  .st .ic{color:var(--accent);}
+  .sd{font-size:12px;color:var(--text-dim);margin-top:5px;line-height:1.6;}
+  .rc{font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:right;margin-bottom:14px;}
+  .rc span{color:var(--accent);font-weight:700;}
+  .cg{display:grid;grid-template-columns:1fr;gap:10px;}
+  .cc2{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:14px 16px;transition:border-color .18s,background .18s;position:relative;overflow:hidden;}
+  .cc2::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .18s;}
+  .cc2:hover{background:var(--card-hover);border-color:var(--border-bright);}
+  .cc2:hover::before{opacity:1;}
+  .ct{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;}
+  .cd{flex:1;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--code);line-height:1.4;word-break:break-all;}
+  .pr{color:var(--text-dim);user-select:none;margin-right:3px;}
+  .cb2{flex-shrink:0;padding:3px 10px;border:1px solid var(--border-bright);border-radius:4px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .cb2:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+  .cb2.copied{border-color:var(--green);color:var(--green);background:rgba(122,173,114,.08);}
+  .dv{height:1px;background:var(--border);margin:9px 0;}
+  .de{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:9px;}
+  .el{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--text-dim);text-transform:uppercase;margin-bottom:4px;}
+  .ex{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:7px 10px;font-family:var(--mono);font-size:11px;color:var(--text-dim);overflow-x:auto;}
+  .ep{color:var(--accent);opacity:.45;margin-right:3px;}
+  .ts{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;background:rgba(122,173,114,.12);border:1px solid rgba(122,173,114,.3);color:var(--green);border-radius:3px;margin-left:8px;vertical-align:middle;}
+  .gl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:6px 0 10px;margin-top:10px;border-top:1px solid var(--border);}
+  .gl:first-child{margin-top:0;border-top:none;}
+  .es{text-align:center;padding:60px 20px;color:var(--text-dim);}
+  .ei{font-size:32px;margin-bottom:10px;opacity:.35;}
+  .mt{display:none;overflow-x:auto;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 12px;gap:2px;scrollbar-width:none;}
+  .mt::-webkit-scrollbar{display:none;}
+  .mtt{flex-shrink:0;padding:9px 12px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:var(--sans);font-size:11px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .mtt.active{color:var(--accent);border-bottom-color:var(--accent);}
+  @media(max-width:768px){aside{display:none;}.mt{display:flex;}main{padding:16px 14px;}.swrap{max-width:180px;}.logo span{display:none;}header{padding:0 12px;}}
+  @media(max-width:480px){.badge{display:none;}.hdiv{display:none;}}
+  ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px;}
+  .c-base{color:var(--accent);}.c-sub{color:#c4a882;}.c-flag{color:var(--code-flag);}.c-arg{color:var(--code-arg);}.c-pipe{color:var(--text-dim);}.c-str{color:#ff9f7f;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">claude<span>_</span>code <span>// REF</span></div>
+  <div class="hdiv"></div>
+  <div class="badge">公式準拠 2025</div>
+  <div class="swrap"><span class="sicon">⌕</span><input type="text" id="si" placeholder="コマンドを検索..." autocomplete="off" spellcheck="false"></div>
+</header>
+<div class="mt" id="mt"></div>
+<div class="layout">
+  <aside id="sb"></aside>
+  <main id="mc"></main>
+</div>
+<script>
+const cats=[
+  {id:'all',icon:'◈',label:'すべて',desc:'全カテゴリのコマンドを一覧表示'},
+  {id:'session',icon:'▶',label:'セッション起動',desc:'claude コマンドで起動・継続・再開する基本コマンド'},
+  {id:'auth',icon:'🔑',label:'認証・アカウント',desc:'ログイン・ログアウト・トークン管理'},
+  {id:'file',icon:'◎',label:'ファイル操作',desc:'ファイル・ディレクトリ・ワークツリー設定'},
+  {id:'model',icon:'⚙',label:'モデル・出力制御',desc:'モデル指定・出力形式・詳細ログ・コスト制御'},
+  {id:'prompt',icon:'✎',label:'システムプロンプト',desc:'プロンプトの置換・追記・最適化フラグ'},
+  {id:'pipeline',icon:'⇌',label:'自動化・パイプライン',desc:'スクリプト・CI/CD・非インタラクティブ実行'},
+  {id:'perm',icon:'🛡',label:'パーミッション制御',desc:'ツールの許可・拒否・モード設定'},
+  {id:'session2',icon:'◷',label:'セッション管理フラグ',desc:'セッションID・名前・継続・フォーク・リモート'},
+  {id:'memory',icon:'◈',label:'CLAUDE.md / メモリ',desc:'プロジェクト記憶とメモリ管理'},
+  {id:'mcp',icon:'⬡',label:'MCP 管理',desc:'Model Context Protocolサーバーの登録・管理'},
+  {id:'slash',icon:'/',label:'スラッシュコマンド',desc:'セッション内で使うインタラクティブコマンド（全量）'},
+  {id:'misc',icon:'⋯',label:'その他・管理',desc:'アップデート・インストール・デバッグなど'},
+];
+const cmds=[
+  {cat:'session',syn:'claude',copy:'claude',r:'<span class="c-base">claude</span>',desc:'インタラクティブモードで起動する。通常の対話セッションはこれだけでOK。',exH:'<span class="c-base">claude</span>'},
+  {cat:'session',syn:'claude "query"',copy:'claude "explain this project"',r:'<span class="c-base">claude</span> <span class="c-str">"explain this project"</span>',desc:'インタラクティブモードを初期プロンプト付きで起動する。',exH:'<span class="c-base">claude</span> <span class="c-str">"このプロジェクトを説明して"</span>'},
+  {cat:'session',syn:'claude -p "query"',copy:'claude -p "explain this function"',r:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"query"</span>',desc:'プリントモード（非インタラクティブ）で実行しstdoutに出力して終了。スクリプト・自動化に最適。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"バグを探して"</span>'},
+  {cat:'session',syn:'cat file | claude -p "query"',copy:'cat logs.txt | claude -p "explain"',r:'<span class="c-pipe">cat</span> <span class="c-arg">file.txt</span> <span class="c-pipe">|</span> <span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"query"</span>',desc:'ファイルの内容をパイプでClaudeに渡す。ログ解析や大きなファイルの変換に。',exH:'<span class="c-pipe">cat</span> <span class="c-arg">error.log</span> <span class="c-pipe">|</span> <span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"エラー原因を分析して"</span>'},
+  {cat:'session',syn:'claude -c',copy:'claude -c',r:'<span class="c-base">claude</span> <span class="c-flag">-c</span>',desc:'現在のディレクトリで最新のセッションを継続して起動する（--continue と同じ）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-c</span>'},
+  {cat:'session',syn:'claude -c -p "query"',copy:'claude -c -p "型エラーを確認して"',r:'<span class="c-base">claude</span> <span class="c-flag">-c</span> <span class="c-flag">-p</span> <span class="c-str">"query"</span>',desc:'直前のセッションを継続しつつプリントモードで実行する。',exH:'<span class="c-base">claude</span> <span class="c-flag">-c</span> <span class="c-flag">-p</span> <span class="c-str">"型エラーを確認して"</span>'},
+  {cat:'session',syn:'claude -r "session" "query"',copy:'claude -r "auth-refactor" "Finish this PR"',r:'<span class="c-base">claude</span> <span class="c-flag">-r</span> <span class="c-str">"session"</span> <span class="c-str">"query"</span>',desc:'セッションIDまたは名前で特定のセッションを再開する（--resume と同じ）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-r</span> <span class="c-str">"auth-refactor"</span> <span class="c-str">"このPRを完成させて"</span>'},
+  {cat:'auth',syn:'claude auth login',copy:'claude auth login',r:'<span class="c-base">claude</span> <span class="c-sub">auth login</span>',desc:'Anthropicアカウントにサインインする。--email でメール指定、--sso でSSO、--console でAPI課金のコンソールアカウントを使用。',exH:'<span class="c-base">claude</span> <span class="c-sub">auth login</span> <span class="c-flag">--console</span>'},
+  {cat:'auth',syn:'claude auth logout',copy:'claude auth logout',r:'<span class="c-base">claude</span> <span class="c-sub">auth logout</span>',desc:'Anthropicアカウントからログアウトする。',exH:'<span class="c-base">claude</span> <span class="c-sub">auth logout</span>'},
+  {cat:'auth',syn:'claude auth status',copy:'claude auth status',r:'<span class="c-base">claude</span> <span class="c-sub">auth status</span>',desc:'認証状態をJSONで表示する（--text で人が読みやすい形式）。ログイン中はexit 0、未ログインはexit 1。',exH:'<span class="c-base">claude</span> <span class="c-sub">auth status</span> <span class="c-flag">--text</span>'},
+  {cat:'auth',syn:'claude setup-token',copy:'claude setup-token',r:'<span class="c-base">claude</span> <span class="c-sub">setup-token</span>',desc:'CI・スクリプト向けの長期OAuthトークンを生成してターミナルに表示する（保存はしない）。Claudeサブスクリプションが必要。',exH:'<span class="c-base">claude</span> <span class="c-sub">setup-token</span>'},
+  {cat:'file',syn:'claude --add-dir path',copy:'claude --add-dir ../src --add-dir ../lib',r:'<span class="c-base">claude</span> <span class="c-flag">--add-dir</span> <span class="c-arg">&lt;path&gt;</span>',desc:'追加の作業ディレクトリをコンテキストに加えて起動する。複数指定可。注意: .claude/ 設定はここからは読み込まれない。',exH:'<span class="c-base">claude</span> <span class="c-flag">--add-dir</span> <span class="c-arg">../src</span> <span class="c-flag">--add-dir</span> <span class="c-arg">../lib</span>'},
+  {cat:'file',syn:'claude -f file',copy:'claude -f README.md',r:'<span class="c-base">claude</span> <span class="c-flag">-f</span> <span class="c-arg">&lt;file&gt;</span>',desc:'特定ファイルを最初のコンテキストとして指定して起動する。AIがそのファイルを読んだ状態で会話が始まる。',exH:'<span class="c-base">claude</span> <span class="c-flag">-f</span> <span class="c-arg">README.md</span>'},
+  {cat:'file',syn:'claude -w name / --worktree',copy:'claude -w feature-auth',r:'<span class="c-base">claude</span> <span class="c-flag">-w</span> <span class="c-arg">&lt;name&gt;</span>',desc:'Gitワークツリー（repo/.claude/worktrees/name）を作成して隔離環境でセッションを開始する。名前省略で自動生成。--tmux と組み合わせて並列作業ができる。',exH:'<span class="c-base">claude</span> <span class="c-flag">-w</span> <span class="c-arg">feature-auth</span>'},
+  {cat:'model',syn:'claude --model model',copy:'claude --model claude-sonnet-4-6',r:'<span class="c-base">claude</span> <span class="c-flag">--model</span> <span class="c-arg">&lt;model&gt;</span>',desc:'使用モデルをフルネームまたはエイリアス（sonnet / opus）で指定する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--model</span> <span class="c-arg">claude-sonnet-4-6</span>'},
+  {cat:'model',syn:'claude --output-format format',copy:'claude -p query --output-format json',r:'<span class="c-base">claude</span> <span class="c-flag">--output-format</span> <span class="c-arg">json</span>',desc:'出力形式を指定する（text / json / stream-json）。スクリプト処理にはjsonが便利。プリントモード（-p）で使用。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"解析して"</span> <span class="c-flag">--output-format</span> <span class="c-arg">json</span>'},
+  {cat:'model',syn:'claude --effort level',copy:'claude --effort high',r:'<span class="c-base">claude</span> <span class="c-flag">--effort</span> <span class="c-arg">&lt;level&gt;</span>',desc:'セッションの思考努力レベルを設定する（low / medium / high / xhigh / max）。maxはOpus 4.6専用でセッション限定。',exH:'<span class="c-base">claude</span> <span class="c-flag">--effort</span> <span class="c-arg">high</span>'},
+  {cat:'model',syn:'claude --verbose',copy:'claude --verbose',r:'<span class="c-base">claude</span> <span class="c-flag">--verbose</span>',desc:'詳細ログを有効化してターン毎の全出力を表示する。AIの思考プロセスや内部状態の確認に使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">--verbose</span> <span class="c-flag">-f</span> <span class="c-arg">main.py</span>'},
+  {cat:'model',syn:'claude --debug category',copy:'claude --debug api,mcp',r:'<span class="c-base">claude</span> <span class="c-flag">--debug</span> <span class="c-arg">[category]</span>',desc:'デバッグモードを有効化する。カテゴリフィルタリング可（例: api,hooks または !statsig,!file）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--debug</span> <span class="c-arg">api,mcp</span>'},
+  {cat:'model',syn:'claude --debug-file path',copy:'claude --debug-file /tmp/claude-debug.log',r:'<span class="c-base">claude</span> <span class="c-flag">--debug-file</span> <span class="c-arg">&lt;path&gt;</span>',desc:'デバッグログを指定ファイルに書き出す。デバッグモードを暗黙的に有効化。CLAUDE_CODE_DEBUG_LOGS_DIRより優先。',exH:'<span class="c-base">claude</span> <span class="c-flag">--debug-file</span> <span class="c-arg">/tmp/claude-debug.log</span>'},
+  {cat:'model',syn:'claude --max-turns n',copy:'claude -p --max-turns 5 query',r:'<span class="c-base">claude</span> <span class="c-flag">--max-turns</span> <span class="c-arg">&lt;n&gt;</span>',desc:'AIの最大応答ターン数を制限する（プリントモード専用）。制限に達するとエラーで終了。デフォルトは制限なし。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--max-turns</span> <span class="c-arg">5</span> <span class="c-str">"テスト実行して"</span>'},
+  {cat:'model',syn:'claude --fallback-model model',copy:'claude -p --fallback-model sonnet query',r:'<span class="c-base">claude</span> <span class="c-flag">--fallback-model</span> <span class="c-arg">&lt;model&gt;</span>',desc:'デフォルトモデルが過負荷のとき自動的にフォールバックするモデルを指定する（プリントモード専用）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--fallback-model</span> <span class="c-arg">sonnet</span> <span class="c-str">"解析して"</span>'},
+  {cat:'model',syn:'claude --max-budget-usd amount',copy:'claude -p --max-budget-usd 5.00 query',r:'<span class="c-base">claude</span> <span class="c-flag">--max-budget-usd</span> <span class="c-arg">&lt;amount&gt;</span>',desc:'API呼び出しに使用する最大金額（ドル）を設定する（プリントモード専用）。コスト管理に使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--max-budget-usd</span> <span class="c-arg">5.00</span> <span class="c-str">"大量ファイルを解析"</span>'},
+  {cat:'model',syn:'claude --betas feature',copy:'claude --betas interleaved-thinking',r:'<span class="c-base">claude</span> <span class="c-flag">--betas</span> <span class="c-arg">&lt;feature&gt;</span>',desc:'APIリクエストに含めるベータ機能を指定する（APIキー利用者のみ）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--betas</span> <span class="c-arg">interleaved-thinking</span>'},
+  {cat:'prompt',syn:'claude --system-prompt text',copy:'claude --system-prompt You are a Python expert',r:'<span class="c-base">claude</span> <span class="c-flag">--system-prompt</span> <span class="c-str">"text"</span>',desc:'デフォルトのシステムプロンプト全体をカスタムテキストで置き換える。--system-prompt-file と排他。',exH:'<span class="c-base">claude</span> <span class="c-flag">--system-prompt</span> <span class="c-str">"あなたはPythonの専門家です"</span>'},
+  {cat:'prompt',syn:'claude --system-prompt-file path',copy:'claude --system-prompt-file ./custom-prompt.txt',r:'<span class="c-base">claude</span> <span class="c-flag">--system-prompt-file</span> <span class="c-arg">&lt;path&gt;</span>',desc:'ファイルの内容でシステムプロンプトを置き換える。--system-prompt と排他。',exH:'<span class="c-base">claude</span> <span class="c-flag">--system-prompt-file</span> <span class="c-arg">./prompts/review.txt</span>'},
+  {cat:'prompt',syn:'claude --append-system-prompt text',copy:'claude --append-system-prompt Always use TypeScript',r:'<span class="c-base">claude</span> <span class="c-flag">--append-system-prompt</span> <span class="c-str">"text"</span>',desc:'デフォルトのシステムプロンプト末尾にカスタムテキストを追加する。元の能力を保持しながら制約を追加できる（推奨）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--append-system-prompt</span> <span class="c-str">"常にTypeScriptを使って"</span>'},
+  {cat:'prompt',syn:'claude --append-system-prompt-file path',copy:'claude --append-system-prompt-file ./style-rules.txt',r:'<span class="c-base">claude</span> <span class="c-flag">--append-system-prompt-file</span> <span class="c-arg">&lt;path&gt;</span>',desc:'ファイルの内容をデフォルトのシステムプロンプトに追加する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--append-system-prompt-file</span> <span class="c-arg">./style-rules.txt</span>'},
+  {cat:'prompt',syn:'claude --exclude-dynamic-system-prompt-sections',copy:'claude -p --exclude-dynamic-system-prompt-sections query',r:'<span class="c-base">claude</span> <span class="c-flag">--exclude-dynamic-system-prompt-sections</span>',desc:'マシン固有情報をシステムプロンプトから除外して最初のユーザーメッセージに移す。複数ユーザーでの実行時のプロンプトキャッシュ効率向上に使う（-p 専用）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--exclude-dynamic-system-prompt-sections</span> <span class="c-str">"コードレビューして"</span>'},
+  {cat:'pipeline',syn:'claude -p query (プリントモード基本)',copy:'claude -p query',r:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"query"</span>',desc:'非インタラクティブで実行してstdoutに出力する（--print）。CI/CD・自動化スクリプトの基本形。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"このコードを改善して"</span>'},
+  {cat:'pipeline',syn:'claude --dangerously-skip-permissions',copy:'claude --dangerously-skip-permissions',r:'<span class="c-base">claude</span> <span class="c-flag">--dangerously-skip-permissions</span>',desc:'全パーミッション確認をスキップする（--permission-mode bypassPermissions と同等）。CI等の完全自動化時に使う。人間の監視がない環境でのみ使用。',exH:'<span class="c-base">claude</span> <span class="c-flag">--dangerously-skip-permissions</span> <span class="c-flag">-p</span> <span class="c-str">"テスト実行して"</span>'},
+  {cat:'pipeline',syn:'claude --bare',copy:'claude --bare -p query',r:'<span class="c-base">claude</span> <span class="c-flag">--bare</span>',desc:'ミニマルモード：hooks・skills・plugins・MCPサーバー・メモリ・CLAUDE.mdの自動探索をスキップして高速起動。Bash・ファイル読み書きツールのみ使用可。スクリプト向け。',exH:'<span class="c-base">claude</span> <span class="c-flag">--bare</span> <span class="c-flag">-p</span> <span class="c-str">"ファイルを解析して"</span>'},
+  {cat:'pipeline',syn:'claude --no-session-persistence',copy:'claude -p --no-session-persistence query',r:'<span class="c-base">claude</span> <span class="c-flag">--no-session-persistence</span>',desc:'セッションをディスクに保存せず再開不可にする（プリントモード専用）。一時的な処理でストレージを使いたくない場合に使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--no-session-persistence</span> <span class="c-str">"一時的な解析"</span>'},
+  {cat:'pipeline',syn:'claude --json-schema schema',copy:'claude -p --json-schema schema.json query',r:'<span class="c-base">claude</span> <span class="c-flag">--json-schema</span> <span class="c-arg">&lt;schema&gt;</span>',desc:'エージェント完了後にJSONスキーマに沿った検証済み出力を返す（プリントモード専用）。構造化データが必要な場合に使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--json-schema</span> <span class="c-arg">schema.json</span> <span class="c-str">"解析して"</span>'},
+  {cat:'pipeline',syn:'claude --include-partial-messages',copy:'claude -p --output-format stream-json --include-partial-messages query',r:'<span class="c-base">claude</span> <span class="c-flag">--include-partial-messages</span>',desc:'ストリーミングの途中経過イベントを出力に含める（--print かつ --output-format stream-json が必要）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--output-format</span> <span class="c-arg">stream-json</span> <span class="c-flag">--include-partial-messages</span> <span class="c-str">"解析して"</span>'},
+  {cat:'pipeline',syn:'claude --include-hook-events',copy:'claude -p --output-format stream-json --include-hook-events query',r:'<span class="c-base">claude</span> <span class="c-flag">--include-hook-events</span>',desc:'全フックライフサイクルイベントを出力ストリームに含める。--output-format stream-json が必要。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--output-format</span> <span class="c-arg">stream-json</span> <span class="c-flag">--include-hook-events</span> <span class="c-str">"解析して"</span>'},
+  {cat:'pipeline',syn:'claude --input-format format',copy:'claude -p --output-format json --input-format stream-json',r:'<span class="c-base">claude</span> <span class="c-flag">--input-format</span> <span class="c-arg">&lt;format&gt;</span>',desc:'プリントモードの入力形式を指定する（text / stream-json）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--input-format</span> <span class="c-arg">stream-json</span>'},
+  {cat:'pipeline',syn:'claude --replay-user-messages',copy:'claude -p --input-format stream-json --output-format stream-json --replay-user-messages',r:'<span class="c-base">claude</span> <span class="c-flag">--replay-user-messages</span>',desc:'stdinからのユーザーメッセージをstdoutに再出力して確認する。--input-format stream-json と --output-format stream-json が必要。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--input-format</span> <span class="c-arg">stream-json</span> <span class="c-flag">--replay-user-messages</span>'},
+  {cat:'pipeline',syn:'claude --init (print mode)',copy:'claude -p --init query',r:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--init</span> <span class="c-str">"query"</span>',desc:'セッション前に init マッチャーのSetupフックを実行する（プリントモード専用）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--init</span> <span class="c-str">"コードをレビューして"</span>'},
+  {cat:'pipeline',syn:'claude --init-only',copy:'claude --init-only',r:'<span class="c-base">claude</span> <span class="c-flag">--init-only</span>',desc:'SetupフックとSessionStartフックを実行してから会話を開始せずに終了する。初期化処理だけ走らせたい場合に使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">--init-only</span>'},
+  {cat:'pipeline',syn:'claude --maintenance (print mode)',copy:'claude -p --maintenance query',r:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--maintenance</span> <span class="c-str">"query"</span>',desc:'セッション前に maintenance マッチャーのSetupフックを実行する（プリントモード専用）。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--maintenance</span> <span class="c-str">"クリーンアップして"</span>'},
+  {cat:'pipeline',syn:'claude --permission-prompt-tool tool',copy:'claude -p --permission-prompt-tool mcp_auth_tool query',r:'<span class="c-base">claude</span> <span class="c-flag">--permission-prompt-tool</span> <span class="c-arg">&lt;tool&gt;</span>',desc:'非インタラクティブモードでパーミッション確認を処理するMCPツールを指定する。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-flag">--permission-prompt-tool</span> <span class="c-arg">mcp_auth_tool</span> <span class="c-str">"ファイルを編集して"</span>'},
+  {cat:'perm',syn:'claude --allowedTools tool',copy:'claude --allowedTools Bash Read',r:'<span class="c-base">claude</span> <span class="c-flag">--allowedTools</span> <span class="c-arg">&lt;tool&gt;</span>',desc:'確認なしで実行できるツールを指定する（使用可能ツールの絞り込みは --tools）。パターンマッチ構文が使える。',exH:'<span class="c-base">claude</span> <span class="c-flag">--allowedTools</span> <span class="c-arg">Bash</span> <span class="c-arg">Read</span>'},
+  {cat:'perm',syn:'claude --disallowedTools tool',copy:'claude --disallowedTools Edit',r:'<span class="c-base">claude</span> <span class="c-flag">--disallowedTools</span> <span class="c-arg">&lt;tool&gt;</span>',desc:'モデルのコンテキストから除外して使用不可にするツールを指定する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--disallowedTools</span> <span class="c-arg">Edit</span>'},
+  {cat:'perm',syn:'claude --tools tools',copy:'claude --tools Bash,Edit,Read',r:'<span class="c-base">claude</span> <span class="c-flag">--tools</span> <span class="c-arg">"Bash,Edit,Read"</span>',desc:'利用可能なツールを絞り込む。空文字列で全無効、default で全有効、ツール名カンマ区切りで個別指定。',exH:'<span class="c-base">claude</span> <span class="c-flag">--tools</span> <span class="c-arg">Bash,Read</span>'},
+  {cat:'perm',syn:'claude --permission-mode mode',copy:'claude --permission-mode plan',r:'<span class="c-base">claude</span> <span class="c-flag">--permission-mode</span> <span class="c-arg">&lt;mode&gt;</span>',desc:'パーミッションモードを指定して起動する（default / acceptEdits / plan / auto / dontAsk / bypassPermissions）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--permission-mode</span> <span class="c-arg">plan</span>'},
+  {cat:'perm',syn:'claude --allow-dangerously-skip-permissions',copy:'claude --permission-mode plan --allow-dangerously-skip-permissions',r:'<span class="c-base">claude</span> <span class="c-flag">--allow-dangerously-skip-permissions</span>',desc:'Shift+TabサイクルにbypassPermissionsを追加するが起動時は指定モードで開始できる。後でbypassPermissionsに切り替えたい場合に使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">--permission-mode</span> <span class="c-arg">plan</span> <span class="c-flag">--allow-dangerously-skip-permissions</span>'},
+  {cat:'session2',syn:'claude --continue / -c',copy:'claude --continue',r:'<span class="c-base">claude</span> <span class="c-flag">--continue</span>',desc:'現在のディレクトリで最新のセッションを継続する。/add-dir で追加されたディレクトリのセッションも対象。',exH:'<span class="c-base">claude</span> <span class="c-flag">--continue</span>'},
+  {cat:'session2',syn:'claude --resume / -r session',copy:'claude --resume auth-refactor',r:'<span class="c-base">claude</span> <span class="c-flag">--resume</span> <span class="c-arg">[session]</span>',desc:'IDまたは名前でセッションを再開する。引数なしで対話式ピッカーを表示。',exH:'<span class="c-base">claude</span> <span class="c-flag">--resume</span> <span class="c-arg">auth-refactor</span>'},
+  {cat:'session2',syn:'claude --name / -n name',copy:'claude -n auth-refactor',r:'<span class="c-base">claude</span> <span class="c-flag">-n</span> <span class="c-str">"name"</span>',desc:'セッションに表示名を付ける。/resume や端末タイトルに表示される。名前指定でセッション再開も可能。',exH:'<span class="c-base">claude</span> <span class="c-flag">-n</span> <span class="c-str">"auth-refactor"</span>'},
+  {cat:'session2',syn:'claude --session-id uuid',copy:'claude --session-id 550e8400-e29b-41d4-a716-446655440000',r:'<span class="c-base">claude</span> <span class="c-flag">--session-id</span> <span class="c-arg">&lt;uuid&gt;</span>',desc:'会話に使用するセッションIDを指定する（有効なUUID形式が必要）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--session-id</span> <span class="c-arg">550e8400-...</span>'},
+  {cat:'session2',syn:'claude --fork-session',copy:'claude --resume abc123 --fork-session',r:'<span class="c-base">claude</span> <span class="c-flag">--fork-session</span>',desc:'再開時に新しいセッションIDを生成して元のセッションを保持したままブランチする（--resume または --continue と併用）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--resume</span> <span class="c-arg">abc123</span> <span class="c-flag">--fork-session</span>'},
+  {cat:'session2',syn:'claude --from-pr PR',copy:'claude --from-pr 123',r:'<span class="c-base">claude</span> <span class="c-flag">--from-pr</span> <span class="c-arg">&lt;PR&gt;</span>',desc:'特定のPRに関連付けられたセッションを再開する。PR番号・GitHub/GitLab/BitbucketのURL等を指定可。',exH:'<span class="c-base">claude</span> <span class="c-flag">--from-pr</span> <span class="c-arg">123</span>'},
+  {cat:'session2',syn:'claude --settings path',copy:'claude --settings ./settings.json',r:'<span class="c-base">claude</span> <span class="c-flag">--settings</span> <span class="c-arg">&lt;path&gt;</span>',desc:'追加の設定をJSONファイルのパスまたはJSON文字列で読み込む。',exH:'<span class="c-base">claude</span> <span class="c-flag">--settings</span> <span class="c-arg">./settings.json</span>'},
+  {cat:'session2',syn:'claude --setting-sources list',copy:'claude --setting-sources user,project',r:'<span class="c-base">claude</span> <span class="c-flag">--setting-sources</span> <span class="c-arg">&lt;list&gt;</span>',desc:'ロードする設定ソースをカンマ区切りで指定する（user / project / local）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--setting-sources</span> <span class="c-arg">user,project</span>'},
+  {cat:'session2',syn:'claude --remote task',copy:'claude --remote Fix the login bug',r:'<span class="c-base">claude</span> <span class="c-flag">--remote</span> <span class="c-str">"task"</span>',desc:'claude.ai 上に新しいウェブセッションを作成してタスクを実行する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--remote</span> <span class="c-str">"ログインバグを修正して"</span>'},
+  {cat:'session2',syn:'claude --remote-control / --rc name',copy:'claude --remote-control My Project',r:'<span class="c-base">claude</span> <span class="c-flag">--remote-control</span> <span class="c-arg">[name]</span>',desc:'claude.ai やClaudeアプリからリモート制御できる状態でインタラクティブセッションを開始する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--remote-control</span> <span class="c-str">"My Project"</span>'},
+  {cat:'session2',syn:'claude --remote-control-session-name-prefix prefix',copy:'claude remote-control --remote-control-session-name-prefix dev-box',r:'<span class="c-base">claude</span> <span class="c-flag">--remote-control-session-name-prefix</span> <span class="c-arg">&lt;prefix&gt;</span>',desc:'リモートコントロールセッション名の自動生成時に使われるプレフィックスを設定する。デフォルトはマシンのホスト名（例: myhost-graceful-unicorn）。',exH:'<span class="c-base">claude</span> <span class="c-sub">remote-control</span> <span class="c-flag">--remote-control-session-name-prefix</span> <span class="c-arg">dev-box</span>'},
+  {cat:'session2',syn:'claude --teleport',copy:'claude --teleport',r:'<span class="c-base">claude</span> <span class="c-flag">--teleport</span>',desc:'claude.ai のウェブセッションをローカル端末に引き込む。Claudeサブスクリプションが必要。',exH:'<span class="c-base">claude</span> <span class="c-flag">--teleport</span>'},
+  {cat:'session2',syn:'claude --disable-slash-commands',copy:'claude --disable-slash-commands',r:'<span class="c-base">claude</span> <span class="c-flag">--disable-slash-commands</span>',desc:'このセッションのすべてのスキルとスラッシュコマンドを無効化する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--disable-slash-commands</span>'},
+  {cat:'session2',syn:'claude --agent name',copy:'claude --agent my-custom-agent',r:'<span class="c-base">claude</span> <span class="c-flag">--agent</span> <span class="c-arg">&lt;name&gt;</span>',desc:'このセッションで使用するエージェントを指定する（設定の agent を上書き）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--agent</span> <span class="c-arg">my-custom-agent</span>'},
+  {cat:'session2',syn:'claude --agents json',copy:'claude --agents json',r:'<span class="c-base">claude</span> <span class="c-flag">--agents</span> <span class="c-arg">&lt;json&gt;</span>',desc:'カスタムサブエージェントをJSONで動的に定義する。サブエージェントのfrontmatterと同じフィールド名＋promptフィールドを使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">--agents</span> <span class="c-arg">{reviewer:{prompt:...}}</span>'},
+  {cat:'session2',syn:'claude --teammate-mode mode',copy:'claude --teammate-mode in-process',r:'<span class="c-base">claude</span> <span class="c-flag">--teammate-mode</span> <span class="c-arg">&lt;mode&gt;</span>',desc:'エージェントチームのチームメイト表示方法を設定する（auto / in-process / tmux）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--teammate-mode</span> <span class="c-arg">in-process</span>'},
+  {cat:'session2',syn:'claude --tmux',copy:'claude -w feature-auth --tmux',r:'<span class="c-base">claude</span> <span class="c-flag">--tmux</span>',desc:'ワークツリーのtmuxセッションを作成する（--worktree 必須）。iTerm2があればネイティブペインを使用、--tmux=classic で通常 tmux。',exH:'<span class="c-base">claude</span> <span class="c-flag">-w</span> <span class="c-arg">feature-auth</span> <span class="c-flag">--tmux</span>'},
+  {cat:'session2',syn:'claude --ide',copy:'claude --ide',r:'<span class="c-base">claude</span> <span class="c-flag">--ide</span>',desc:'起動時に有効なIDEが1つだけ存在する場合、自動的にそのIDEに接続する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--ide</span>'},
+  {cat:'memory',syn:'/memory',copy:'/memory',r:'<span class="c-base">/memory</span>',desc:'CLAUDE.md メモリファイルの表示・編集、オートメモリの有効化/無効化、オートメモリエントリの確認ができる。',exH:'<span class="c-base">/memory</span>'},
+  {cat:'memory',syn:'claude --no-memory',copy:'claude --no-memory',r:'<span class="c-base">claude</span> <span class="c-flag">--no-memory</span>',desc:'CLAUDE.md によるメモリ機能を無効化して起動する。プロジェクト設定に依存しないクリーンな状態で始めたい場合に使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">--no-memory</span>'},
+  {cat:'memory',syn:'/init',copy:'/init',r:'<span class="c-base">/init</span>',desc:'プロジェクトに CLAUDE.md ガイドを作成して初期化する。CLAUDE_CODE_NEW_INIT=1 でスキル・hooks・個人メモリファイルの設定もできるインタラクティブフローが起動。',exH:'<span class="c-base">/init</span>'},
+  {cat:'mcp',syn:'claude mcp add name command',copy:'claude mcp add filesystem npx @modelcontextprotocol/server-filesystem',r:'<span class="c-base">claude</span> <span class="c-sub">mcp add</span> <span class="c-arg">&lt;name&gt;</span> <span class="c-arg">&lt;command&gt;</span>',desc:'MCPサーバーを新規登録する。AIと外部サービスをつなぎ機能を拡張できる。',exH:'<span class="c-base">claude</span> <span class="c-sub">mcp add</span> <span class="c-arg">filesystem</span> <span class="c-arg">npx @modelcontextprotocol/server-filesystem</span>'},
+  {cat:'mcp',syn:'claude mcp list',copy:'claude mcp list',r:'<span class="c-base">claude</span> <span class="c-sub">mcp list</span>',desc:'登録済みのMCPサーバー一覧を表示する。',exH:'<span class="c-base">claude</span> <span class="c-sub">mcp list</span>'},
+  {cat:'mcp',syn:'claude mcp remove name',copy:'claude mcp remove filesystem',r:'<span class="c-base">claude</span> <span class="c-sub">mcp remove</span> <span class="c-arg">&lt;name&gt;</span>',desc:'登録済みのMCPサーバーを削除する。',exH:'<span class="c-base">claude</span> <span class="c-sub">mcp remove</span> <span class="c-arg">filesystem</span>'},
+  {cat:'mcp',syn:'claude --mcp-config path',copy:'claude --mcp-config ./mcp.json',r:'<span class="c-base">claude</span> <span class="c-flag">--mcp-config</span> <span class="c-arg">&lt;path&gt;</span>',desc:'MCPサーバー設定をJSONファイルから読み込む（複数スペース区切りで指定可）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--mcp-config</span> <span class="c-arg">./config/mcp.json</span>'},
+  {cat:'mcp',syn:'claude --strict-mcp-config',copy:'claude --strict-mcp-config --mcp-config ./mcp.json',r:'<span class="c-base">claude</span> <span class="c-flag">--strict-mcp-config</span>',desc:'--mcp-config で指定したMCPサーバーのみを使用し、他のすべてのMCP設定を無視する。',exH:'<span class="c-base">claude</span> <span class="c-flag">--strict-mcp-config</span> <span class="c-flag">--mcp-config</span> <span class="c-arg">./mcp.json</span>'},
+  {cat:'mcp',syn:'claude --channels list',copy:'claude --channels plugin:my-notifier@my-marketplace',r:'<span class="c-base">claude</span> <span class="c-flag">--channels</span> <span class="c-arg">&lt;list&gt;</span>',desc:'（リサーチプレビュー）このセッションでチャンネル通知を受け取るMCPサーバーをスペース区切りで指定する。Claude.ai認証が必要。',exH:'<span class="c-base">claude</span> <span class="c-flag">--channels</span> <span class="c-arg">plugin:my-notifier@my-marketplace</span>'},
+  {cat:'mcp',syn:'claude --dangerously-load-development-channels',copy:'claude --dangerously-load-development-channels server:webhook',r:'<span class="c-base">claude</span> <span class="c-flag">--dangerously-load-development-channels</span>',desc:'承認済みリストに載っていないチャンネルをローカル開発用に有効化する。確認プロンプトが表示される。',exH:'<span class="c-base">claude</span> <span class="c-flag">--dangerously-load-development-channels</span> <span class="c-arg">server:webhook</span>'},
+  {cat:'mcp',syn:'/mcp',copy:'/mcp',r:'<span class="c-base">/mcp</span>',desc:'セッション内でMCPサーバー接続とOAuth認証を管理する。',exH:'<span class="c-base">/mcp</span>'},
+  {cat:'slash',syn:'/help',copy:'/help',r:'<span class="c-base">/help</span>',desc:'利用可能なコマンドとショートカット一覧を表示する。',exH:'<span class="c-base">/help</span>'},
+  {cat:'slash',syn:'/clear',copy:'/clear',r:'<span class="c-base">/clear</span>',desc:'会話履歴を全消去してコンテキストを解放する。エイリアス: /reset, /new',exH:'<span class="c-base">/clear</span>'},
+  {cat:'slash',syn:'/compact instructions',copy:'/compact',r:'<span class="c-base">/compact</span> <span class="c-arg">[instructions]</span>',desc:'長い会話を要約・圧縮する。オプションでフォーカス指示を渡せる。コンテキスト上限に近づいたときに使う。',exH:'<span class="c-base">/compact</span> <span class="c-arg">認証周りの実装に集中して</span>'},
+  {cat:'slash',syn:'/status',copy:'/status',r:'<span class="c-base">/status</span>',desc:'バージョン・モデル・アカウント・接続状態を表示するSettings（Statusタブ）を開く。レスポンス中でも動作する。',exH:'<span class="c-base">/status</span>'},
+  {cat:'slash',syn:'/model model',copy:'/model',r:'<span class="c-base">/model</span> <span class="c-arg">[model]</span>',desc:'AIモデルを選択・変更する。対応モデルはeffortレベルを左右矢印で調整可。変更はすぐ反映される。',exH:'<span class="c-base">/model</span> <span class="c-arg">claude-opus-4-6</span>'},
+  {cat:'slash',syn:'/effort level',copy:'/effort high',r:'<span class="c-base">/effort</span> <span class="c-arg">[level]</span>',desc:'モデルの思考努力レベルを設定する（low / medium / high / max / auto）。maxはOpus 4.6専用でセッション限定。引数なしで現在値を表示。',exH:'<span class="c-base">/effort</span> <span class="c-arg">high</span>'},
+  {cat:'slash',syn:'/resume session',copy:'/resume',r:'<span class="c-base">/resume</span> <span class="c-arg">[session]</span>',desc:'IDまたは名前でセッションを再開する。引数なしでセッションピッカーを表示。エイリアス: /continue',exH:'<span class="c-base">/resume</span> <span class="c-arg">auth-refactor</span>'},
+  {cat:'slash',syn:'/rename name',copy:'/rename',r:'<span class="c-base">/rename</span> <span class="c-arg">[name]</span>',desc:'現在のセッションに名前を付けてプロンプトバーに表示する。名前なしで会話履歴から自動生成。',exH:'<span class="c-base">/rename</span> <span class="c-arg">auth-refactor</span>'},
+  {cat:'slash',syn:'/branch name',copy:'/branch',r:'<span class="c-base">/branch</span> <span class="c-arg">[name]</span>',desc:'現在の会話をこの時点でブランチする。元の会話は /resume で戻れる状態で保存される。エイリアス: /fork',exH:'<span class="c-base">/branch</span> <span class="c-arg">try-different-approach</span>'},
+  {cat:'slash',syn:'/rewind',copy:'/rewind',r:'<span class="c-base">/rewind</span>',desc:'会話やコードを過去の時点に巻き戻す。または選択メッセージから要約する（チェックポイント機能）。エイリアス: /checkpoint',exH:'<span class="c-base">/rewind</span>'},
+  {cat:'slash',syn:'/diff',copy:'/diff',r:'<span class="c-base">/diff</span>',desc:'コミット前の変更差分とターン毎の差分を対話的に表示する。左右矢印でgit diff/ターン切替、上下でファイル移動。',exH:'<span class="c-base">/diff</span>'},
+  {cat:'slash',syn:'/context',copy:'/context',r:'<span class="c-base">/context</span>',desc:'現在のコンテキスト使用量をカラーグリッドで可視化する。最適化提案（メモリ膨張・容量警告）も表示。',exH:'<span class="c-base">/context</span>'},
+  {cat:'slash',syn:'/cost',copy:'/cost',r:'<span class="c-base">/cost</span>',desc:'現在のセッションのトークン使用統計を表示する。',exH:'<span class="c-base">/cost</span>'},
+  {cat:'slash',syn:'/usage',copy:'/usage',r:'<span class="c-base">/usage</span>',desc:'プラン使用量とレート制限の状態を表示する。',exH:'<span class="c-base">/usage</span>'},
+  {cat:'slash',syn:'/copy N',copy:'/copy',r:'<span class="c-base">/copy</span> <span class="c-arg">[N]</span>',desc:'直近のアシスタントレスポンスをクリップボードにコピーする。Nを指定でN番目を選択。コードブロックがある場合はピッカーで選択可。w でファイル書き込みも可。',exH:'<span class="c-base">/copy</span> <span class="c-arg">2</span>'},
+  {cat:'slash',syn:'/export filename',copy:'/export',r:'<span class="c-base">/export</span> <span class="c-arg">[filename]</span>',desc:'現在の会話をプレーンテキストでエクスポートする。ファイル名指定で直接書き込み、なしでクリップボードかファイル保存のダイアログを表示。',exH:'<span class="c-base">/export</span> <span class="c-arg">session-log.txt</span>'},
+  {cat:'slash',syn:'/plan description',copy:'/plan',r:'<span class="c-base">/plan</span> <span class="c-arg">[description]</span>',desc:'プランモードに直接入る。説明を渡すとそのタスクでプランモードを開始する。',exH:'<span class="c-base">/plan</span> <span class="c-arg">認証バグを修正する</span>'},
+  {cat:'slash',syn:'/permissions',copy:'/permissions',r:'<span class="c-base">/permissions</span>',desc:'ツールパーミッションの許可・確認・拒否ルールを管理する対話式ダイアログを開く。エイリアス: /allowed-tools',exH:'<span class="c-base">/permissions</span>'},
+  {cat:'slash',syn:'/hooks',copy:'/hooks',r:'<span class="c-base">/hooks</span>',desc:'ツールイベントのフック設定を表示する。',exH:'<span class="c-base">/hooks</span>'},
+  {cat:'slash',syn:'/add-dir path',copy:'/add-dir ./src',r:'<span class="c-base">/add-dir</span> <span class="c-arg">&lt;path&gt;</span>',desc:'セッション中に作業ディレクトリを追加してファイルアクセスを拡張する。',exH:'<span class="c-base">/add-dir</span> <span class="c-arg">./src</span>'},
+  {cat:'slash',syn:'/tasks',copy:'/tasks',r:'<span class="c-base">/tasks</span>',desc:'バックグラウンドで実行中のタスクを一覧表示・管理する。エイリアス: /bashes',exH:'<span class="c-base">/tasks</span>'},
+  {cat:'slash',syn:'/agents',copy:'/agents',r:'<span class="c-base">/agents</span>',desc:'エージェント（サブエージェント）の設定を管理する。',exH:'<span class="c-base">/agents</span>'},
+  {cat:'slash',syn:'/config',copy:'/config',r:'<span class="c-base">/config</span>',desc:'テーマ・モデル・出力スタイルなどの設定インターフェースを開く。エイリアス: /settings',exH:'<span class="c-base">/config</span>'},
+  {cat:'slash',syn:'/theme',copy:'/theme',r:'<span class="c-base">/theme</span>',desc:'カラーテーマを変更する。ライト・ダーク・色覚対応（daltonized）・ANSIテーマなど。',exH:'<span class="c-base">/theme</span>'},
+  {cat:'slash',syn:'/color color',copy:'/color orange',r:'<span class="c-base">/color</span> <span class="c-arg">[color|default]</span>',desc:'このセッションのプロンプトバーの色を設定する（red/blue/green/yellow/purple/orange/pink/cyan/default）。',exH:'<span class="c-base">/color</span> <span class="c-arg">orange</span>'},
+  {cat:'slash',syn:'/skills',copy:'/skills',r:'<span class="c-base">/skills</span>',desc:'利用可能なスキル一覧を表示する。',exH:'<span class="c-base">/skills</span>'},
+  {cat:'slash',syn:'/plugin',copy:'/plugin install code-review@claude-plugins-official',r:'<span class="c-base">/plugin</span>',desc:'Claude Codeプラグインを管理する（インストール・削除など）。',exH:'<span class="c-base">/plugin</span> <span class="c-arg">install code-review@claude-plugins-official</span>'},
+  {cat:'slash',syn:'/batch instruction',copy:'/batch migrate src from Solid to React',r:'<span class="c-base">/batch</span> <span class="c-arg">&lt;instruction&gt;</span>',desc:'大規模なコードベース変更を並列エージェントで実行する。コードベースを調査→5〜30の独立した作業単位に分解→承認後に並列実行。Gitリポジトリが必要。',exH:'<span class="c-base">/batch</span> <span class="c-arg">migrate src from Solid to React</span>',isSkill:true},
+  {cat:'slash',syn:'/simplify focus',copy:'/simplify',r:'<span class="c-base">/simplify</span> <span class="c-arg">[focus]</span>',desc:'最近変更したファイルをコード品質・再利用・効率性の観点でレビューして修正する。3つのレビューエージェントが並列実行されて結果を統合する。',exH:'<span class="c-base">/simplify</span> <span class="c-arg">メモリ効率に集中して</span>',isSkill:true},
+  {cat:'slash',syn:'/loop interval prompt',copy:'/loop 5m check if the deploy finished',r:'<span class="c-base">/loop</span> <span class="c-arg">[interval]</span> <span class="c-arg">[prompt]</span>',desc:'セッション中にプロンプトを繰り返し実行する。インターバル省略でAIが自動ペーシング、プロンプト省略で自律メンテナンスチェック。エイリアス: /proactive',exH:'<span class="c-base">/loop</span> <span class="c-arg">5m</span> <span class="c-arg">デプロイが完了したか確認</span>',isSkill:true},
+  {cat:'slash',syn:'/security-review',copy:'/security-review',r:'<span class="c-base">/security-review</span>',desc:'現在のブランチの変更をセキュリティ脆弱性（インジェクション・認証・データ漏洩等）の観点で分析する。',exH:'<span class="c-base">/security-review</span>'},
+  {cat:'slash',syn:'/autofix-pr prompt',copy:'/autofix-pr',r:'<span class="c-base">/autofix-pr</span> <span class="c-arg">[prompt]</span>',desc:'PRのCIエラーやレビューコメントを監視して自動修正するウェブセッションを起動する。gh CLIが必要。',exH:'<span class="c-base">/autofix-pr</span> <span class="c-arg">lintとtype errorのみ修正して</span>'},
+  {cat:'slash',syn:'/ultraplan prompt',copy:'/ultraplan fix the auth system',r:'<span class="c-base">/ultraplan</span> <span class="c-arg">&lt;prompt&gt;</span>',desc:'ウルトラプランセッションでプランを作成し、ブラウザでレビューしてリモートまたはターミナルに送って実行する。',exH:'<span class="c-base">/ultraplan</span> <span class="c-arg">認証システムを修正する</span>'},
+  {cat:'slash',syn:'/btw question',copy:'/btw このライブラリは何をするの',r:'<span class="c-base">/btw</span> <span class="c-arg">&lt;question&gt;</span>',desc:'会話履歴に追加せずにサイドクエスチョンを素早く質問する。',exH:'<span class="c-base">/btw</span> <span class="c-arg">このライブラリは何をするの</span>'},
+  {cat:'slash',syn:'/debug description',copy:'/debug',r:'<span class="c-base">/debug</span> <span class="c-arg">[description]</span>',desc:'現在のセッションのデバッグログを有効化して問題を診断する。デフォルト無効なのでこのコマンドを実行したタイミングからログが開始される。',exH:'<span class="c-base">/debug</span> <span class="c-arg">MCPサーバーが接続できない</span>',isSkill:true},
+  {cat:'slash',syn:'/claude-api',copy:'/claude-api',r:'<span class="c-base">/claude-api</span>',desc:'Claude APIリファレンス（tool use・streaming・batches・構造化出力など）をプロジェクト言語に合わせて読み込む。コードがanthropicをimportしているとき自動起動もされる。',exH:'<span class="c-base">/claude-api</span>',isSkill:true},
+  {cat:'slash',syn:'/insights',copy:'/insights',r:'<span class="c-base">/insights</span>',desc:'Claude Codeセッションの分析レポートを生成する（プロジェクト領域・インタラクションパターン・摩擦ポイントなど）。',exH:'<span class="c-base">/insights</span>'},
+  {cat:'slash',syn:'/stats',copy:'/stats',r:'<span class="c-base">/stats</span>',desc:'日次使用量・セッション履歴・継続日数（streak）・モデル利用傾向を可視化する。',exH:'<span class="c-base">/stats</span>'},
+  {cat:'slash',syn:'/doctor',copy:'/doctor',r:'<span class="c-base">/doctor</span>',desc:'Claude Codeのインストールと設定を診断・検証する。f でClaudeに修正させることができる。',exH:'<span class="c-base">/doctor</span>'},
+  {cat:'slash',syn:'/exit',copy:'/exit',r:'<span class="c-base">/exit</span>',desc:'CLIを終了する。エイリアス: /quit',exH:'<span class="c-base">/exit</span>'},
+  {cat:'slash',syn:'/schedule description',copy:'/schedule',r:'<span class="c-base">/schedule</span> <span class="c-arg">[description]</span>',desc:'ルーティン（定期実行タスク）を作成・更新・一覧・実行する。Claudeが対話形式でセットアップをガイドする。',exH:'<span class="c-base">/schedule</span> <span class="c-arg">毎朝9時にPRをレビューする</span>'},
+  {cat:'slash',syn:'/team-onboarding',copy:'/team-onboarding',r:'<span class="c-base">/team-onboarding</span>',desc:'過去30日間のClaude Code使用履歴からチームオンボーディングガイドを自動生成する。',exH:'<span class="c-base">/team-onboarding</span>'},
+  {cat:'slash',syn:'/statusline',copy:'/statusline',r:'<span class="c-base">/statusline</span>',desc:'Claude Codeのステータスラインを設定する。希望する表示内容を説明するか、引数なしでシェルプロンプトから自動設定。',exH:'<span class="c-base">/statusline</span>'},
+  {cat:'slash',syn:'/remote-control',copy:'/remote-control',r:'<span class="c-base">/remote-control</span>',desc:'このセッションをclaude.aiからリモート制御できる状態にする。エイリアス: /rc',exH:'<span class="c-base">/remote-control</span>'},
+  {cat:'slash',syn:'/teleport',copy:'/teleport',r:'<span class="c-base">/teleport</span>',desc:'claude.ai のウェブセッションをこの端末に引き込む。エイリアス: /tp',exH:'<span class="c-base">/teleport</span>'},
+  {cat:'slash',syn:'/sandbox',copy:'/sandbox',r:'<span class="c-base">/sandbox</span>',desc:'サンドボックスモードをトグルする（対応プラットフォームのみ）。',exH:'<span class="c-base">/sandbox</span>'},
+  {cat:'slash',syn:'/ide',copy:'/ide',r:'<span class="c-base">/ide</span>',desc:'IDE統合の管理とステータスを表示する。',exH:'<span class="c-base">/ide</span>'},
+  {cat:'slash',syn:'/desktop',copy:'/desktop',r:'<span class="c-base">/desktop</span>',desc:'現在のセッションをClaude Code デスクトップアプリで続ける（macOS・Windows限定）。エイリアス: /app',exH:'<span class="c-base">/desktop</span>'},
+  {cat:'slash',syn:'/chrome',copy:'/chrome',r:'<span class="c-base">/chrome</span>',desc:'Claude in Chrome の設定を管理する。',exH:'<span class="c-base">/chrome</span>'},
+  {cat:'slash',syn:'/extra-usage',copy:'/extra-usage',r:'<span class="c-base">/extra-usage</span>',desc:'レート制限に達したときも作業を継続するための追加使用量を設定する。',exH:'<span class="c-base">/extra-usage</span>'},
+  {cat:'slash',syn:'/fast on-off',copy:'/fast on',r:'<span class="c-base">/fast</span> <span class="c-arg">[on|off]</span>',desc:'ファストモードをオン/オフする。',exH:'<span class="c-base">/fast</span> <span class="c-arg">on</span>'},
+  {cat:'slash',syn:'/feedback report',copy:'/feedback',r:'<span class="c-base">/feedback</span> <span class="c-arg">[report]</span>',desc:'Claude Code についてフィードバックを送信する。エイリアス: /bug',exH:'<span class="c-base">/feedback</span> <span class="c-arg">レポート内容</span>'},
+  {cat:'slash',syn:'/install-github-app',copy:'/install-github-app',r:'<span class="c-base">/install-github-app</span>',desc:'Claude GitHub Actions アプリをリポジトリにセットアップする。リポジトリ選択と連携設定をガイドしてくれる。',exH:'<span class="c-base">/install-github-app</span>'},
+  {cat:'slash',syn:'/install-slack-app',copy:'/install-slack-app',r:'<span class="c-base">/install-slack-app</span>',desc:'Claude Slack アプリをインストールする。ブラウザでOAuthフローを開いて認証する。',exH:'<span class="c-base">/install-slack-app</span>'},
+  {cat:'slash',syn:'/keybindings',copy:'/keybindings',r:'<span class="c-base">/keybindings</span>',desc:'キーバインディング設定ファイルを開く、または新規作成する。',exH:'<span class="c-base">/keybindings</span>'},
+  {cat:'slash',syn:'/login',copy:'/login',r:'<span class="c-base">/login</span>',desc:'セッション内でAnthropicアカウントにサインインする。',exH:'<span class="c-base">/login</span>'},
+  {cat:'slash',syn:'/logout',copy:'/logout',r:'<span class="c-base">/logout</span>',desc:'セッション内でAnthropicアカウントからサインアウトする。',exH:'<span class="c-base">/logout</span>'},
+  {cat:'slash',syn:'/mobile',copy:'/mobile',r:'<span class="c-base">/mobile</span>',desc:'Claude モバイルアプリのダウンロード用QRコードを表示する。エイリアス: /ios, /android',exH:'<span class="c-base">/mobile</span>'},
+  {cat:'slash',syn:'/passes',copy:'/passes',r:'<span class="c-base">/passes</span>',desc:'Claude Code の無料1週間分を友人とシェアする（対象アカウントのみ表示）。',exH:'<span class="c-base">/passes</span>'},
+  {cat:'slash',syn:'/powerup',copy:'/powerup',r:'<span class="c-base">/powerup</span>',desc:'アニメーションデモ付きのインタラクティブなレッスンでClaude Codeの機能を学ぶ。',exH:'<span class="c-base">/powerup</span>'},
+  {cat:'slash',syn:'/privacy-settings',copy:'/privacy-settings',r:'<span class="c-base">/privacy-settings</span>',desc:'プライバシー設定を表示・変更する（ProおよびMaxプラン限定）。',exH:'<span class="c-base">/privacy-settings</span>'},
+  {cat:'slash',syn:'/release-notes',copy:'/release-notes',r:'<span class="c-base">/release-notes</span>',desc:'インタラクティブなバージョンピッカーでチェンジログを表示する。',exH:'<span class="c-base">/release-notes</span>'},
+  {cat:'slash',syn:'/reload-plugins',copy:'/reload-plugins',r:'<span class="c-base">/reload-plugins</span>',desc:'アクティブなプラグインをすべて再読み込みして変更を即時反映する（再起動不要）。',exH:'<span class="c-base">/reload-plugins</span>'},
+  {cat:'slash',syn:'/remote-env',copy:'/remote-env',r:'<span class="c-base">/remote-env</span>',desc:'--remote で起動するウェブセッションのデフォルトリモート環境を設定する。',exH:'<span class="c-base">/remote-env</span>'},
+  {cat:'slash',syn:'/setup-bedrock',copy:'/setup-bedrock',r:'<span class="c-base">/setup-bedrock</span>',desc:'Amazon Bedrockの認証・リージョン・モデルピンをウィザード形式で設定する（CLAUDE_CODE_USE_BEDROCK=1 が必要）。',exH:'<span class="c-base">/setup-bedrock</span>'},
+  {cat:'slash',syn:'/setup-vertex',copy:'/setup-vertex',r:'<span class="c-base">/setup-vertex</span>',desc:'Google Vertex AIの認証・プロジェクト・リージョン・モデルピンをウィザード形式で設定する（CLAUDE_CODE_USE_VERTEX=1 が必要）。',exH:'<span class="c-base">/setup-vertex</span>'},
+  {cat:'slash',syn:'/stickers',copy:'/stickers',r:'<span class="c-base">/stickers</span>',desc:'Claude Code ステッカーを注文する。',exH:'<span class="c-base">/stickers</span>'},
+  {cat:'slash',syn:'/terminal-setup',copy:'/terminal-setup',r:'<span class="c-base">/terminal-setup</span>',desc:'Shift+Enterなどのターミナルキーバインディングを設定する（VS Code・Alacritty・Warpなど特定ターミナルで必要）。',exH:'<span class="c-base">/terminal-setup</span>'},
+  {cat:'slash',syn:'/upgrade',copy:'/upgrade',r:'<span class="c-base">/upgrade</span>',desc:'上位プランへのアップグレードページを開く（ProおよびMaxプランのみ表示）。',exH:'<span class="c-base">/upgrade</span>'},
+  {cat:'slash',syn:'/voice',copy:'/voice',r:'<span class="c-base">/voice</span>',desc:'プッシュトゥトーク音声入力のオン/オフを切り替える。Claude.aiアカウントが必要。',exH:'<span class="c-base">/voice</span>'},
+  {cat:'slash',syn:'/web-setup',copy:'/web-setup',r:'<span class="c-base">/web-setup</span>',desc:'ローカルの gh CLI 認証情報を使ってGitHubアカウントをClaude Code on the webに接続する。',exH:'<span class="c-base">/web-setup</span>'},
+  {cat:'misc',syn:'claude update',copy:'claude update',r:'<span class="c-base">claude</span> <span class="c-sub">update</span>',desc:'Claude Code を最新バージョンにアップデートする。',exH:'<span class="c-base">claude</span> <span class="c-sub">update</span>'},
+  {cat:'misc',syn:'claude install version',copy:'claude install stable',r:'<span class="c-base">claude</span> <span class="c-sub">install</span> <span class="c-arg">[version]</span>',desc:'ネイティブバイナリをインストール・再インストールする。バージョン番号（例: 2.1.118）または stable / latest が指定可。',exH:'<span class="c-base">claude</span> <span class="c-sub">install</span> <span class="c-arg">stable</span>'},
+  {cat:'misc',syn:'claude -v / --version',copy:'claude -v',r:'<span class="c-base">claude</span> <span class="c-flag">-v</span>',desc:'現在インストールされているバージョンを表示する。',exH:'<span class="c-base">claude</span> <span class="c-flag">-v</span>'},
+  {cat:'misc',syn:'claude agents',copy:'claude agents',r:'<span class="c-base">claude</span> <span class="c-sub">agents</span>',desc:'設定済みのサブエージェント一覧をソース別にグループ化して表示する。',exH:'<span class="c-base">claude</span> <span class="c-sub">agents</span>'},
+  {cat:'misc',syn:'claude auto-mode defaults',copy:'claude auto-mode defaults > rules.json',r:'<span class="c-base">claude</span> <span class="c-sub">auto-mode defaults</span>',desc:'組み込みのautoモード分類ルールをJSONで出力する。claude auto-mode config で有効な設定確認も可。',exH:'<span class="c-base">claude</span> <span class="c-sub">auto-mode defaults</span> <span class="c-pipe">&gt;</span> <span class="c-arg">rules.json</span>'},
+  {cat:'misc',syn:'claude project purge path',copy:'claude project purge ~/work/repo --dry-run',r:'<span class="c-base">claude</span> <span class="c-sub">project purge</span> <span class="c-arg">[path]</span>',desc:'プロジェクトのローカルClaude Code状態（トランスクリプト・タスクリスト・デバッグログなど）を全削除する。--dry-run でプレビュー、-y でスキップ、--all で全プロジェクト。',exH:'<span class="c-base">claude</span> <span class="c-sub">project purge</span> <span class="c-arg">~/work/repo</span> <span class="c-flag">--dry-run</span>'},
+  {cat:'misc',syn:'claude plugin install name',copy:'claude plugin install code-review@claude-plugins-official',r:'<span class="c-base">claude</span> <span class="c-sub">plugin install</span> <span class="c-arg">&lt;name&gt;</span>',desc:'プラグインをインストールする。エイリアス: claude plugins。サブコマンドはplugin referenceを参照。',exH:'<span class="c-base">claude</span> <span class="c-sub">plugin install</span> <span class="c-arg">code-review@claude-plugins-official</span>'},
+  {cat:'misc',syn:'claude remote-control name',copy:'claude remote-control --name My Project',r:'<span class="c-base">claude</span> <span class="c-sub">remote-control</span>',desc:'claude.ai またはClaudeアプリからリモート制御するためのサーバーモードで起動する（ローカルセッションなし）。',exH:'<span class="c-base">claude</span> <span class="c-sub">remote-control</span> <span class="c-flag">--name</span> <span class="c-str">"My Project"</span>'},
+  {cat:'misc',syn:'claude ultrareview target',copy:'claude ultrareview 1234 --json',r:'<span class="c-base">claude</span> <span class="c-sub">ultrareview</span> <span class="c-arg">[target]</span>',desc:'ultrareview を非インタラクティブで実行する。結果をstdoutに出力し成功でexit 0、失敗でexit 1。--json で生ペイロード、--timeout で30分デフォルトを上書き。',exH:'<span class="c-base">claude</span> <span class="c-sub">ultrareview</span> <span class="c-arg">1234</span> <span class="c-flag">--json</span>'},
+  {cat:'misc',syn:'claude --chrome',copy:'claude --chrome',r:'<span class="c-base">claude</span> <span class="c-flag">--chrome</span>',desc:'Chromeブラウザ統合を有効化してウェブ自動化・テストを可能にする。',exH:'<span class="c-base">claude</span> <span class="c-flag">--chrome</span>'},
+  {cat:'misc',syn:'claude --no-chrome',copy:'claude --no-chrome',r:'<span class="c-base">claude</span> <span class="c-flag">--no-chrome</span>',desc:'このセッションのChromeブラウザ統合を無効化する（--chrome の逆）。',exH:'<span class="c-base">claude</span> <span class="c-flag">--no-chrome</span>'},
+  {cat:'misc',syn:'claude --print / -p',copy:'claude -p query',r:'<span class="c-base">claude</span> <span class="c-flag">--print</span> / <span class="c-flag">-p</span>',desc:'インタラクティブモードなしでレスポンスを出力する（-p の長形式）。Agent SDK ドキュメントでプログラム利用の詳細を確認できる。',exH:'<span class="c-base">claude</span> <span class="c-flag">-p</span> <span class="c-str">"解析して"</span>'},
+  {cat:'misc',syn:'claude --enable-auto-mode (removed v2.1.111)',copy:'claude --permission-mode auto',r:'<span class="c-base">claude</span> <span class="c-flag">--permission-mode</span> <span class="c-arg">auto</span>',desc:'v2.1.111で削除。現在はautoモードがShift+Tabサイクルにデフォルトで含まれている。起動時にautoモードにするには --permission-mode auto を使う。',exH:'<span class="c-base">claude</span> <span class="c-flag">--permission-mode</span> <span class="c-arg">auto</span>'},
+  {cat:'misc',syn:'claude --plugin-dir path',copy:'claude --plugin-dir ./my-plugins',r:'<span class="c-base">claude</span> <span class="c-flag">--plugin-dir</span> <span class="c-arg">&lt;path&gt;</span>',desc:'このセッション限定でディレクトリからプラグインを読み込む。複数ディレクトリは --plugin-dir を繰り返す。',exH:'<span class="c-base">claude</span> <span class="c-flag">--plugin-dir</span> <span class="c-arg">./my-plugins</span>'}
+];
+
+let curCat=‘all’,q=’’;
+function cnt(id){return id===‘all’?cmds.length:cmds.filter(c=>c.cat===id).length;}
+function buildNav(){
+const sb=document.getElementById(‘sb’),mt=document.getElementById(‘mt’);
+sb.innerHTML=’’;mt.innerHTML=’’;
+const lbl=document.createElement(‘div’);lbl.className=‘slbl’;lbl.textContent=‘CATEGORY’;sb.appendChild(lbl);
+cats.forEach(cat=>{
+const b=document.createElement(‘button’);b.className=‘cb’+(cat.id===curCat?’ active’:’’);
+b.innerHTML=’<span class="ci">’+cat.icon+’</span>’+cat.label+’<span class="cc">’+cnt(cat.id)+’</span>’;
+b.onclick=()=>{curCat=cat.id;q=’’;document.getElementById(‘si’).value=’’;buildNav();renderMain();};
+sb.appendChild(b);
+const t=document.createElement(‘button’);t.className=‘mtt’+(cat.id===curCat?’ active’:’’);
+t.textContent=cat.label;t.onclick=()=>{curCat=cat.id;q=’’;document.getElementById(‘si’).value=’’;buildNav();renderMain();};
+mt.appendChild(t);
+});
+}
+function renderMain(){
+const mc=document.getElementById(‘mc’);
+const cat=cats.find(c=>c.id===curCat);
+let filtered=cmds.filter(cmd=>{
+if(curCat!==‘all’&&cmd.cat!==curCat)return false;
+if(!q)return true;
+const lq=q.toLowerCase();
+return cmd.syn.toLowerCase().includes(lq)||cmd.desc.toLowerCase().includes(lq)||cmd.copy.toLowerCase().includes(lq);
+});
+let html=’’;
+if(curCat!==‘all’&&!q)html+=’<div class="sh"><div class="st"><span class="ic">’+cat.icon+’</span>’+cat.label+’</div><div class="sd">’+cat.desc+’</div></div>’;
+if(q)html+=’<div class="rc">検索結果: <span>’+filtered.length+’</span> 件</div>’;
+if(filtered.length===0){
+html+=’<div class="es"><div class="ei">⌀</div><p>該当するコマンドが見つかりません</p></div>’;
+} else {
+html+=’<div class="cg">’;
+if(curCat===‘all’&&!q){
+cats.filter(c=>c.id!==‘all’).forEach(cat=>{
+const cc=filtered.filter(cmd=>cmd.cat===cat.id);
+if(!cc.length)return;
+html+=’<div class="gl">’+cat.icon+’  ‘+cat.label+’</div>’;
+cc.forEach(cmd=>{html+=card(cmd);});
+});
+} else {filtered.forEach(cmd=>{html+=card(cmd);});}
+html+=’</div>’;
+}
+mc.innerHTML=html;
+mc.querySelectorAll(’.cb2’).forEach(btn=>{
+btn.onclick=e=>{
+e.stopPropagation();
+const txt=btn.dataset.copy;
+btn.textContent=‘✓ Copied!’;btn.classList.add(‘copied’);
+setTimeout(()=>{btn.textContent=‘Copy’;btn.classList.remove(‘copied’);},2000);
+try{navigator.clipboard.writeText(txt);}catch(_){
+const ta=document.createElement(‘textarea’);ta.value=txt;ta.style.cssText=‘position:fixed;opacity:0’;
+document.body.appendChild(ta);ta.select();document.execCommand(‘copy’);document.body.removeChild(ta);
+}
+};
+});
+}
+function card(cmd){
+const sk=cmd.isSkill?’<span class="ts">Skill</span>’:’’;
+const copy=cmd.copy.replace(/”/g,’"’);
+return ‘<div class="cc2"><div class="ct"><div class="cd"><span class="pr">$</span>’+cmd.r+sk+’</div>’
++’<button class="cb2" data-copy="'+copy+'">Copy</button></div>’
++’<div class="dv"></div><div class="de">’+cmd.desc+’</div>’
++’<div class="el">使用例</div><div class="ex"><span class="ep">$</span>’+cmd.exH+’</div></div>’;
+}
+document.getElementById(‘si’).addEventListener(‘input’,e=>{
+q=e.target.value.trim();
+if(q&&curCat!==‘all’){curCat=‘all’;buildNav();}
+renderMain();
+});
+buildNav();renderMain();
+</script>
+
+</body>
+</html>
