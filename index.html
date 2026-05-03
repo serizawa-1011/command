@@ -74,16 +74,15 @@
   ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px;}
   .c-base{color:var(--accent);}.c-sub{color:#c4a882;}.c-flag{color:var(--code-flag);}.c-arg{color:var(--code-arg);}.c-pipe{color:var(--text-dim);}.c-str{color:#ff9f7f;}
 </style>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="512x512" href="claude-code-icon-512.png">
-<link rel="shortcut icon" href="claude-code-icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIOiDjOaZryAtLT4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzE0MTQxMyIvPgoKICA8IS0tIENMQVVERSAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjIzMCIKICAgIGZvbnQtZmFtaWx5PSInSmV0QnJhaW5zIE1vbm8nLCAnQ291cmllciBOZXcnLCBtb25vc3BhY2UiCiAgICBmb250LXNpemU9Ijg4IgogICAgZm9udC13ZWlnaHQ9IjcwMCIKICAgIGZpbGw9IiNkOTc3NTciCiAgICB0ZXh0LWFuY2hvcj0ibWlkZGxlIgogICAgbGV0dGVyLXNwYWNpbmc9Ii0yIj5DTEFVREU8L3RleHQ+CgogIDwhLS0gQ09ERSAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjM0MCIKICAgIGZvbnQtZmFtaWx5PSInSmV0QnJhaW5zIE1vbm8nLCAnQ291cmllciBOZXcnLCBtb25vc3BhY2UiCiAgICBmb250LXNpemU9IjExMCIKICAgIGZvbnQtd2VpZ2h0PSI3MDAiCiAgICBmaWxsPSIjZDk3NzU3IgogICAgdGV4dC1hbmNob3I9Im1pZGRsZSIKICAgIGxldHRlci1zcGFjaW5nPSI0Ij5DT0RFPC90ZXh0Pgo8L3N2Zz4=">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIOiDjOaZryAtLT4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzE0MTQxMyIvPgoKICA8IS0tIENMQVVERSAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjIzMCIKICAgIGZvbnQtZmFtaWx5PSInSmV0QnJhaW5zIE1vbm8nLCAnQ291cmllciBOZXcnLCBtb25vc3BhY2UiCiAgICBmb250LXNpemU9Ijg4IgogICAgZm9udC13ZWlnaHQ9IjcwMCIKICAgIGZpbGw9IiNkOTc3NTciCiAgICB0ZXh0LWFuY2hvcj0ibWlkZGxlIgogICAgbGV0dGVyLXNwYWNpbmc9Ii0yIj5DTEFVREU8L3RleHQ+CgogIDwhLS0gQ09ERSAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjM0MCIKICAgIGZvbnQtZmFtaWx5PSInSmV0QnJhaW5zIE1vbm8nLCAnQ291cmllciBOZXcnLCBtb25vc3BhY2UiCiAgICBmb250LXNpemU9IjExMCIKICAgIGZvbnQtd2VpZ2h0PSI3MDAiCiAgICBmaWxsPSIjZDk3NzU3IgogICAgdGV4dC1hbmNob3I9Im1pZGRsZSIKICAgIGxldHRlci1zcGFjaW5nPSI0Ij5DT0RFPC90ZXh0Pgo8L3N2Zz4=">
+<link rel="shortcut icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIOiDjOaZryAtLT4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzE0MTQxMyIvPgoKICA8IS0tIENMQVVERSAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjIzMCIKICAgIGZvbnQtZmFtaWx5PSInSmV0QnJhaW5zIE1vbm8nLCAnQ291cmllciBOZXcnLCBtb25vc3BhY2UiCiAgICBmb250LXNpemU9Ijg4IgogICAgZm9udC13ZWlnaHQ9IjcwMCIKICAgIGZpbGw9IiNkOTc3NTciCiAgICB0ZXh0LWFuY2hvcj0ibWlkZGxlIgogICAgbGV0dGVyLXNwYWNpbmc9Ii0yIj5DTEFVREU8L3RleHQ+CgogIDwhLS0gQ09ERSAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjM0MCIKICAgIGZvbnQtZmFtaWx5PSInSmV0QnJhaW5zIE1vbm8nLCAnQ291cmllciBOZXcnLCBtb25vc3BhY2UiCiAgICBmb250LXNpemU9IjExMCIKICAgIGZvbnQtd2VpZ2h0PSI3MDAiCiAgICBmaWxsPSIjZDk3NzU3IgogICAgdGV4dC1hbmNob3I9Im1pZGRsZSIKICAgIGxldHRlci1zcGFjaW5nPSI0Ij5DT0RFPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Claude Code">
+<meta name="apple-mobile-web-app-title" content="CC Ref">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#141413">
-
-<link rel="manifest" href="manifest.webmanifest"></head>
+</head>
 <body>
 <header>
   <div class="logo">claude<span>_</span>code <span>// REF</span></div>
